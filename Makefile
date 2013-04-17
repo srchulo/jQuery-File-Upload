@@ -1,7 +1,7 @@
 # This Makefile is for the jQuery::File::Upload extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 6.64 (Revision: 66400) from the contents of
+# 6.62 (Revision: 66200) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -20,7 +20,6 @@
 #     NAME => q[jQuery::File::Upload]
 #     PL_FILES => {  }
 #     PREREQ_PM => { URI=>q[0], JSON::XS=>q[0], Image::Magick=>q[0], CGI=>q[0], Test::More=>q[0], Net::SSH2::SFTP=>q[0], Digest::MD5=>q[0], Cwd=>q[0], Net::SSH2=>q[0] }
-#     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/jQuery/File/Upload.pm]
 #     clean => { FILES=>q[jQuery-File-Upload-*] }
 #     dist => { COMPRESS=>q[gzip -9f], SUFFIX=>q[gz] }
@@ -30,30 +29,30 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/lib64/perl5/Config.pm).
+# These definitions are from config.sh (via /System/Library/Perl/5.12/darwin-thread-multi-2level/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
-CC = gcc
-CCCDLFLAGS = -fPIC
-CCDLFLAGS = -Wl,-E -Wl,-rpath,/usr/lib64/perl5/CORE
-DLEXT = so
+CC = clang
+CCCDLFLAGS =  
+CCDLFLAGS =  
+DLEXT = bundle
 DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
-LD = gcc
-LDDLFLAGS = -shared -O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=4 -m64 -mtune=generic
-LDFLAGS =  -fstack-protector
+LD = clang -mmacosx-version-min=10.8
+LDDLFLAGS = -arch i386 -arch x86_64 -bundle -undefined dynamic_lookup -L/usr/local/lib -fstack-protector
+LDFLAGS = -arch i386 -arch x86_64 -fstack-protector -L/usr/local/lib
 LIBC = 
 LIB_EXT = .a
 OBJ_EXT = .o
-OSNAME = linux
-OSVERS = 2.6.32-220.el6.x86_64
-RANLIB = :
-SITELIBEXP = /usr/local/share/perl5
-SITEARCHEXP = /usr/local/lib64/perl5
-SO = so
-VENDORARCHEXP = /usr/lib64/perl5/vendor_perl
-VENDORLIBEXP = /usr/share/perl5/vendor_perl
+OSNAME = darwin
+OSVERS = 12.0
+RANLIB = /usr/bin/ar s
+SITELIBEXP = /Library/Perl/5.12
+SITEARCHEXP = /Library/Perl/5.12/darwin-thread-multi-2level
+SO = dylib
+VENDORARCHEXP = /Network/Library/Perl/5.12/darwin-thread-multi-2level
+VENDORLIBEXP = /Network/Library/Perl/5.12
 
 
 # --- MakeMaker constants section:
@@ -62,11 +61,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = jQuery::File::Upload
 NAME_SYM = jQuery_File_Upload
-VERSION = 0.13
+VERSION = 0.14
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_13
+VERSION_SYM = 0_14
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.13
+XS_VERSION = 0.14
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -80,53 +79,53 @@ MAN3EXT = 3pm
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
-PERLPREFIX = /usr
+PERLPREFIX = /
 SITEPREFIX = /usr/local
-VENDORPREFIX = /usr
-INSTALLPRIVLIB = /usr/share/perl5
+VENDORPREFIX = /usr/local
+INSTALLPRIVLIB = /Library/Perl/Updates/5.12.4
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /usr/local/share/perl5
+INSTALLSITELIB = /Library/Perl/5.12
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = /usr/share/perl5/vendor_perl
+INSTALLVENDORLIB = /Network/Library/Perl/5.12
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /usr/lib64/perl5
+INSTALLARCHLIB = /Library/Perl/Updates/5.12.4/darwin-thread-multi-2level
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /usr/local/lib64/perl5
+INSTALLSITEARCH = /Library/Perl/5.12/darwin-thread-multi-2level
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = /usr/lib64/perl5/vendor_perl
+INSTALLVENDORARCH = /Network/Library/Perl/5.12/darwin-thread-multi-2level
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
 INSTALLBIN = /usr/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
 INSTALLSITEBIN = /usr/local/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
-INSTALLVENDORBIN = /usr/bin
+INSTALLVENDORBIN = /usr/local/bin
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
 INSTALLSCRIPT = /usr/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
 INSTALLSITESCRIPT = /usr/local/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
-INSTALLVENDORSCRIPT = /usr/bin
+INSTALLVENDORSCRIPT = /usr/local/bin
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
 INSTALLMAN1DIR = /usr/share/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
 INSTALLSITEMAN1DIR = /usr/local/share/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
-INSTALLVENDORMAN1DIR = /usr/share/man/man1
+INSTALLVENDORMAN1DIR = /usr/local/share/man/man1
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
 INSTALLMAN3DIR = /usr/share/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
 INSTALLSITEMAN3DIR = /usr/local/share/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
-INSTALLVENDORMAN3DIR = /usr/share/man/man3
+INSTALLVENDORMAN3DIR = /usr/local/share/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /usr/share/perl5
-PERL_ARCHLIB = /usr/lib64/perl5
+PERL_LIB = /System/Library/Perl/5.12
+PERL_ARCHLIB = /System/Library/Perl/5.12/darwin-thread-multi-2level
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/lib64/perl5/CORE
+PERL_INC = /System/Library/Perl/5.12/darwin-thread-multi-2level/CORE
 PERL = /usr/bin/perl
 FULLPERL = /usr/bin/perl
 ABSPERL = $(PERL)
@@ -141,9 +140,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/local/share/perl5/ExtUtils/MakeMaker.pm
-MM_VERSION  = 6.64
-MM_REVISION = 66400
+MAKEMAKER   = /Library/Perl/Updates/5.12.4/ExtUtils/MakeMaker.pm
+MM_VERSION  = 6.62
+MM_REVISION = 66200
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -195,13 +194,13 @@ PM_TO_BLIB = lib/jQuery/File/Upload.pm \
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 6.64
+MM_Unix_VERSION = 6.62
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
 # --- MakeMaker tool_autosplit section:
 # Usage: $(AUTOSPLITFILE) FileToSplit AutoDirToSplitInto
-AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$ARGV[1], 0, 1, 1)' --
+AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)' --
 
 
 
@@ -245,7 +244,7 @@ makemakerdflt : all
 
 
 # --- MakeMaker dist section:
-TAR = tar
+TAR = COPY_EXTENDED_ATTRIBUTES_DISABLE=1 COPYFILE_DISABLE=1 tar
 TARFLAGS = cvf
 ZIP = zip
 ZIPFLAGS = -r
@@ -260,7 +259,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = jQuery-File-Upload
-DISTVNAME = jQuery-File-Upload-0.13
+DISTVNAME = jQuery-File-Upload-0.14
 
 
 # --- MakeMaker macro section:
@@ -489,7 +488,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: 0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: unknown' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
@@ -509,7 +508,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Net::SSH2::SFTP: 0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI: 0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: 5.006' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: 0.13' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: 0.14' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -518,7 +517,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "Adam Hopkins <srchulo@cpan.org>"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "unknown"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
@@ -536,30 +535,30 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '   "prereqs" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "build" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Test::More" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::More" : 0' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "configure" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : 0' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "CGI" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Cwd" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Digest::MD5" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Image::Magick" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "JSON::XS" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Net::SSH2" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Net::SSH2::SFTP" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "URI" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "CGI" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Cwd" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Digest::MD5" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Image::Magick" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "JSON::XS" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Net::SSH2" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Net::SSH2::SFTP" : 0,' >> META_new.json
+	$(NOECHO) $(ECHO) '            "URI" : 0,' >> META_new.json
 	$(NOECHO) $(ECHO) '            "perl" : "5.006"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.13"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.14"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -655,17 +654,17 @@ ci :
 distmeta : create_distdir metafile
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{META.yml};' \
 	  -e 'eval { maniadd({q{META.yml} => q{Module YAML meta-data (added by MakeMaker)}}) }' \
-	  -e '    or print "Could not add META.yml to MANIFEST: $$$${'\''@'\''}\n"' --
+	  -e '    or print "Could not add META.yml to MANIFEST: $${'\''@'\''}\n"' --
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -f q{META.json};' \
 	  -e 'eval { maniadd({q{META.json} => q{Module JSON meta-data (added by MakeMaker)}}) }' \
-	  -e '    or print "Could not add META.json to MANIFEST: $$$${'\''@'\''}\n"' --
+	  -e '    or print "Could not add META.json to MANIFEST: $${'\''@'\''}\n"' --
 
 
 
 # --- MakeMaker distsignature section:
 distsignature : create_distdir
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } ' \
-	  -e '    or print "Could not add SIGNATURE to MANIFEST: $$$${'\''@'\''}\n"' --
+	  -e '    or print "Could not add SIGNATURE to MANIFEST: $${'\''@'\''}\n"' --
 	$(NOECHO) cd $(DISTVNAME) && $(TOUCH) SIGNATURE
 	cd $(DISTVNAME) && cpansign -s
 
@@ -855,7 +854,7 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="$(VERSION)">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.14">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Server-side solution for the L&lt;jQuery File Upload|https://github.com/blueimp/jQuery-File-Upload/&gt; plugin.</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Adam Hopkins &lt;srchulo@cpan.org&gt;</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
@@ -868,7 +867,7 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::SSH2" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::SSH2::SFTP" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="URI::" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.10" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-thread-multi-2level-5.12" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> $(DISTNAME).ppd
