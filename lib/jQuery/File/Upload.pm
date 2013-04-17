@@ -16,7 +16,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -2330,7 +2330,10 @@ This method can be populated with whatever you like. Its purpose is
 if you need to get access to other data in one of your
 L<pre/post request|/"PRE/POST REQUEST METHODS">. This way you
 can access any outside data you need by calling L<data|/"data"> on
-the jQuery::File::Upload object that you are passed.
+the jQuery::File::Upload object that you are passed. However, keep in mind
+that if you are using L<Catalyst>, you will have access to the context
+object via the jQuery::File::Upload object that is passed in, and this
+would be an equally good place to store/retrieve data that you need.
 
 =head2 JUST GETTERS
 
