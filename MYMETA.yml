@@ -27,4 +27,4 @@ requires:
   Net::SSH2::SFTP: 0
   URI: 0
   perl: 5.006
-version: 0.14
+version: 0.15
