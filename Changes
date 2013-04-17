@@ -58,3 +58,7 @@ Revision history for jQuery-File-Upload
 0.13
 
 	fixed issue where IE needs the content-type to be text/plain. suggested by this bug: https://rt.cpan.org/Ticket/Display.html?id=84300&results=fcb4720e2a3df735d29b41e959a7c5af
+
+0.15
+
+	fixed bug

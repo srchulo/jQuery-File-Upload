@@ -656,6 +656,7 @@ sub is_image { shift->{is_image} }
 sub print_response { 
 	my $self = shift;
 
+	my $content_type = 'text/plain';
 	if(defined $self->ctx) { 
 
 		#thanks to Lukas Rampa for this suggestion
