@@ -980,7 +980,10 @@ This method can be populated with whatever you like. Its purpose is
 if you need to get access to other data in one of your
 pre/post request. This way you
 can access any outside data you need by calling data on
-the jQuery::File::Upload object that you are passed.
+the jQuery::File::Upload object that you are passed. However, keep in mind
+that if you are using Catalyst, you will have access to the context
+object via the jQuery::File::Upload object that is passed in, and this
+would be an equally good place to store/retrieve data that you need.
 .SS "\s-1JUST\s0 \s-1GETTERS\s0"
 .IX Subsection "JUST GETTERS"
 \fIoutput\fR
