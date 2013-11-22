@@ -16,7 +16,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -2101,13 +2101,6 @@ file is an image. Default is 80.
 
 This sets the height for the thumbnail that will be created if the
 file is an image. Default is 80.
-
-=head3 tumbnail_quality
-
-  $j_fu->thumbnail_quality(70);
-
-This sets the quality of the generated thumbnail. Default is 70 and it
-can be on a scale of 0-100. See L<Image::Magick> for more information.
 
 =head3 thumbnail_quality
 
