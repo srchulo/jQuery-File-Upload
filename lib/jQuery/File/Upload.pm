@@ -16,7 +16,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -1107,6 +1107,8 @@ sub _save_local {
 		while (my $bytesread = $io_handle->read($buffer,1024)) {
 			print OUTFILE $buffer;
 		}
+
+		close OUTFILE;
 	}
 }
 

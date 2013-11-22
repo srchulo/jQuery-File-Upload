@@ -70,3 +70,7 @@ Revision history for jQuery-File-Upload
 0.17
 
 	moved _clear call in handle_request to end of subroutine
+
+0.18
+
+	added 'close OUTFILE;' in _save_local.
