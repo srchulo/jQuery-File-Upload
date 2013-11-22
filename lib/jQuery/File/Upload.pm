@@ -16,7 +16,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -2610,7 +2610,7 @@ L<jQuery File Upload|https://github.com/blueimp/jQuery-File-Upload/>
 
 =head1 AUTHOR
 
-Adam Hopkins, E<lt>srchulo@cpan.org<gt>
+Adam Hopkins, E<lt>srchulo@cpan.org>
 
 =head1 Bugs
 

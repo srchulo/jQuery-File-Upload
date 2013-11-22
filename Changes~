@@ -78,7 +78,3 @@ Revision history for jQuery-File-Upload
 0.19
 
 	removed duplicate entry for thumbnail_prex in docs
-
-0.20
-
-	Fixed docs for <gt> by author name
