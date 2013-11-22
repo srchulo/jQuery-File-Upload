@@ -62,3 +62,7 @@ Revision history for jQuery-File-Upload
 0.15
 
 	fixed bug
+
+0.16
+
+	added to documentation for the data subroutine about using catalyst context object to store data

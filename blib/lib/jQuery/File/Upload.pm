@@ -16,7 +16,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -677,7 +677,7 @@ sub print_response {
 sub handle_request { 
 	my $self = shift;
 	my ($print) = @_;
-	$self->_clear;
+
 	my $method = $self->_get_request_method;
 
 	if($method eq 'GET') { 
@@ -701,6 +701,7 @@ sub handle_request {
 	}
 
 	$self->print_response if $print;
+	$self->_clear;
 }
 
 sub generate_output { 
