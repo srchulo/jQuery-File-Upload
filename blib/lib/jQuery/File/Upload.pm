@@ -6,6 +6,7 @@ use warnings;
 
 use CGI;
 use JSON::XS;
+use JSON;
 use Net::SSH2;
 use Net::SSH2::SFTP;
 use Image::Magick;
@@ -16,7 +17,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',

@@ -20,6 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'CGI' => 0,
 		'JSON::XS' => 0,
+		'JSON' => 0,
 		'Net::SSH2' => 0,
 		'Net::SSH2::SFTP' => 0,
 		'Image::Magick' => 0,

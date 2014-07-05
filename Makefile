@@ -19,7 +19,7 @@
 #     MIN_PERL_VERSION => q[5.006]
 #     NAME => q[jQuery::File::Upload]
 #     PL_FILES => {  }
-#     PREREQ_PM => { URI=>q[0], JSON::XS=>q[0], Image::Magick=>q[0], CGI=>q[0], Test::More=>q[0], Net::SSH2::SFTP=>q[0], Digest::MD5=>q[0], Net::SSH2=>q[0], Cwd=>q[0] }
+#     PREREQ_PM => { URI=>q[0], JSON::XS=>q[0], Image::Magick=>q[0], CGI=>q[0], Test::More=>q[0], Net::SSH2::SFTP=>q[0], Digest::MD5=>q[0], JSON=>q[0], Cwd=>q[0], Net::SSH2=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/jQuery/File/Upload.pm]
 #     clean => { FILES=>q[jQuery-File-Upload-*] }
@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = jQuery::File::Upload
 NAME_SYM = jQuery_File_Upload
-VERSION = 0.23
+VERSION = 0.24
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_23
+VERSION_SYM = 0_24
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.23
+XS_VERSION = 0.24
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -262,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = jQuery-File-Upload
-DISTVNAME = jQuery-File-Upload-0.23
+DISTVNAME = jQuery-File-Upload-0.24
 
 
 # --- MakeMaker macro section:
@@ -508,12 +508,13 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Cwd: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Digest::MD5: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Image::Magick: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  JSON: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  JSON::XS: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Net::SSH2: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Net::SSH2::SFTP: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.006'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.23'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.24'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -554,6 +555,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "Cwd" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Digest::MD5" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Image::Magick" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "JSON" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "JSON::XS" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Net::SSH2" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Net::SSH2::SFTP" : "0",' >> META_new.json
@@ -563,7 +565,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.23"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.24"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -873,6 +875,7 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Cwd::" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Digest::MD5" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Image::Magick" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="JSON::" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="JSON::XS" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::SSH2" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Net::SSH2::SFTP" />' >> $(DISTNAME).ppd

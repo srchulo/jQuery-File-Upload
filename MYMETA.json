@@ -36,6 +36,7 @@
             "Cwd" : "0",
             "Digest::MD5" : "0",
             "Image::Magick" : "0",
+            "JSON" : "0",
             "JSON::XS" : "0",
             "Net::SSH2" : "0",
             "Net::SSH2::SFTP" : "0",
@@ -45,5 +46,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.23"
+   "version" : "0.24"
 }
