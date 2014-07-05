@@ -865,18 +865,27 @@ sub _post {
 sub _generate_output { 
 	my $self = shift;
   	
-  my %hash;
-  $hash{'name'} = $self->show_client_filename ? $self->client_filename . "" : $self->filename;
-  $hash{'size'} = $self->{file_size};
-  $hash{'url'} = $self->url;
-  $hash{'thumbnailUrl'} = $self->thumbnail_url;
-  $hash{'deleteUrl'} = $self->_delete_url;
-  $hash{'deleteType'} = 'DELETE';
+	my $method = $self->_get_request_method;
+	my $obj;
 
-  $hash{'error'} = $self->_generate_error;
+	if($method eq 'POST') {
+		my %hash;
+		$hash{'name'} = $self->show_client_filename ? $self->client_filename . "" : $self->filename;
+		$hash{'size'} = $self->{file_size};
+		$hash{'url'} = $self->url;
+		$hash{'thumbnailUrl'} = $self->thumbnail_url;
+		$hash{'deleteUrl'} = $self->_delete_url;
+		$hash{'deleteType'} = 'DELETE';
+
+		$hash{'error'} = $self->_generate_error;
+		$obj->{files} = [\%hash];
+	}
+	elsif($method eq 'DELETE') { 
+		$obj->{$self->_get_param('filename')} = JSON::true;
+	}
 
 	my $json = JSON::XS->new->ascii->pretty->allow_nonref;
-	$self->{output} = $json->encode({files => [\%hash]});
+	$self->{output} = $json->encode($obj);
 }
 
 sub _delete { 
@@ -902,6 +911,8 @@ sub _delete {
 		unlink $self->upload_dir . '/' . $filename;
 		unlink($self->thumbnail_upload_dir . '/' . $thumbnail_filename) if $image_yn eq 'y';
 	}
+
+	$self->_generate_output;
 }
 
 sub _get_param { 

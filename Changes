@@ -91,3 +91,8 @@ Revision history for jQuery-File-Upload
 0.22
 
 	Updated deleteType, deleteUrl, and thumbnailUrl for new jQuery File Upload
+
+
+0.23
+
+	Updated delete response for new expected JSON
