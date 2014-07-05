@@ -82,3 +82,12 @@ Revision history for jQuery-File-Upload
 0.20
 
 	Fixed docs for <gt> by author name
+
+0.21
+
+	Fixed docs for <gt> by author name
+
+
+0.22
+
+	Updated deleteType, deleteUrl, and thumbnailUrl for new jQuery File Upload

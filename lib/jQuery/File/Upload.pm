@@ -16,7 +16,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -737,10 +737,10 @@ sub generate_output {
 
 		$self->_set_urls;
 		$h{url} = $_->{url} eq '' ? $self->url : $_->{url};
-		$h{thumbnail_url} = $_->{thumbnail_url} eq '' ? $self->thumbnail_url : $_->{thumbnail_url};
+		$h{thumbnailUrl} = $_->{thumbnailUrl} eq '' ? $self->thumbnail_url : $_->{thumbnailUrl};
 
-		$h{delete_url} = $_->{'delete_url'} eq '' ? $self->_delete_url($_->{delete_params}) : $_->{'delete_url'};
-		$h{delete_type} = 'DELETE';
+		$h{deleteUrl} = $_->{'deleteUrl'} eq '' ? $self->_delete_url($_->{delete_params}) : $_->{'deleteUrl'};
+		$h{deleteType} = 'DELETE';
 		push @arr, \%h;
 
 		#reset for the next time around
@@ -865,18 +865,27 @@ sub _post {
 sub _generate_output { 
 	my $self = shift;
   	
-  my %hash;
-	$hash{'name'} = $self->show_client_filename ? $self->client_filename . "" : $self->filename;
-  $hash{'size'} = $self->{file_size};
-  $hash{'url'} = $self->url;
-  $hash{'thumbnail_url'} = $self->thumbnail_url;
-  $hash{'delete_url'} = $self->_delete_url;
-  $hash{'delete_type'} = 'DELETE';
+	my $method = $self->_get_request_method;
+	my $obj;
 
-	$hash{'error'} = $self->_generate_error;
+	if($method eq 'POST') {
+		my %hash;
+		$hash{'name'} = $self->show_client_filename ? $self->client_filename . "" : $self->filename;
+		$hash{'size'} = $self->{file_size};
+		$hash{'url'} = $self->url;
+		$hash{'thumbnailUrl'} = $self->thumbnail_url;
+		$hash{'deleteUrl'} = $self->_delete_url;
+		$hash{'deleteType'} = 'DELETE';
+
+		$hash{'error'} = $self->_generate_error;
+		$obj->{files} = [\%hash];
+	}
+	elsif($method eq 'DELETE') { 
+		$obj->{$self->_get_param('filename')} = JSON::true;
+	}
 
 	my $json = JSON::XS->new->ascii->pretty->allow_nonref;
-	$self->{output} = $json->encode({files => [\%hash]});
+	$self->{output} = $json->encode($obj);
 }
 
 sub _delete { 
@@ -902,6 +911,8 @@ sub _delete {
 		unlink $self->upload_dir . '/' . $filename;
 		unlink($self->thumbnail_upload_dir . '/' . $thumbnail_filename) if $image_yn eq 'y';
 	}
+
+	$self->_generate_output;
 }
 
 sub _get_param { 
@@ -2324,7 +2335,7 @@ with things such as url generation, try setting this manually.
 
 This method can be populated with whatever you like. Its purpose is
 if you need to get access to other data in one of your
-L<pre/post request|/"PRE/POST REQUEST METHODS">. This way you
+L</PRE/POST REQUEST METHODS>. This way you
 can access any outside data you need by calling L<data|/"data"> on
 the jQuery::File::Upload object that you are passed. However, keep in mind
 that if you are using L<Catalyst>, you will have access to the context
