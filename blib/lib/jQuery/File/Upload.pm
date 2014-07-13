@@ -17,7 +17,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -652,6 +652,7 @@ sub output { shift->{output} }
 sub url { shift->{url} }
 sub thumbnail_url { shift->{thumbnail_url} }
 sub is_image { shift->{is_image} }
+sub size { shift->{file_size} }
 
 #OTHER METHODS
 sub print_response { 
@@ -2374,6 +2375,15 @@ This returns the resulting thumbnail url of the image.
 Returns whether or not the uploaded file was an image.
 This should be called after handle_request or in
 L<post_post|/"post_post">.
+
+=head3 size
+
+  my $size = $j_fu->size;
+
+Returns the size of the uploaded file.
+This should be called after handle_request or in
+L<post_post|/"post_post">.
+
 
 =head2 OTHER METHODS
 

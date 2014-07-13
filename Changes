@@ -96,3 +96,9 @@ Revision history for jQuery-File-Upload
 0.23
 
 	Updated delete response for new expected JSON
+
+0.24
+
+
+0.25
+	added size function for file size

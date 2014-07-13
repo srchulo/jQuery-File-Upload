@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = jQuery::File::Upload
 NAME_SYM = jQuery_File_Upload
-VERSION = 0.24
+VERSION = 0.25
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_24
+VERSION_SYM = 0_25
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.24
+XS_VERSION = 0.25
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -262,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = jQuery-File-Upload
-DISTVNAME = jQuery-File-Upload-0.24
+DISTVNAME = jQuery-File-Upload-0.25
 
 
 # --- MakeMaker macro section:
@@ -514,7 +514,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Net::SSH2::SFTP: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.006'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.24'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.25'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -565,7 +565,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.24"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.25"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
