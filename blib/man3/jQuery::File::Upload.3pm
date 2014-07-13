@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "jQuery::File::Upload 3"
-.TH jQuery::File::Upload 3 "2014-07-12" "perl v5.16.2" "User Contributed Perl Documentation"
+.TH jQuery::File::Upload 3 "2014-07-13" "perl v5.16.2" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1122,6 +1122,15 @@ to set unique identifiers (such as an id for the file or the primary key) so tha
 find the file in your database easier to perform whatever operations
 you want to on it. \fBNote:\fR This will be called even if
 should_delete is set to false.
+If your pre_delete returns a value, this will be interpreted as an error
+message and the delete call will be terminated and will return the error.
+For example:
+.PP
+.Vb 3
+\&  $j_fu\->pre_delete(sub { 
+\&    return \*(AqYou cannot delete this file.\*(Aq; #file will not be deleted
+\&  });
+.Ve
 .PP
 \fIpost_delete\fR
 .IX Subsection "post_delete"
@@ -1155,6 +1164,15 @@ or
 .PP
 pre_post will be called before a post request is handled.
 \&\s-1POST\s0 requests are what happen when jQuery File Upload uploads your file.
+If your pre_post returns a value, this will be interpreted as an error
+message and the post call will be terminated and will return the error.
+For example:
+.PP
+.Vb 3
+\&  $j_fu\->pre_post(sub { 
+\&    return \*(AqYou have too many files.\*(Aq; #file will not be uploaded
+\&  });
+.Ve
 .PP
 \fIpost_post\fR
 .IX Subsection "post_post"

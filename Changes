@@ -105,3 +105,6 @@ Revision history for jQuery-File-Upload
 
 0.26
 	fixed issue in generate_output where url was not set
+
+0.27
+	filenames now generated using Data::GUID. pre_post and pre_delete can now return errors.

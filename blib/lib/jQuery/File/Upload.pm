@@ -2,7 +2,7 @@ package jQuery::File::Upload;
 
 use 5.008008;
 use strict;
-use warnings;
+#use warnings;
 
 use CGI;
 use JSON::XS;
@@ -11,13 +11,13 @@ use Net::SSH2;
 use Net::SSH2::SFTP;
 use Image::Magick;
 use Cwd 'abs_path';
-use Digest::MD5 qw(md5_hex);
 use URI;
+use Data::GUID;
 
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -111,6 +111,7 @@ sub new {
 		width => undef,
 		height => undef,
 		num_files_in_dir => undef,
+		user_error => undef,
         @_,                 # Override previous attributes
     };
     return bless $self, $class;
@@ -687,16 +688,20 @@ sub handle_request {
 		&{$self->post_get}($self);
 	}
 	elsif($method eq 'PATCH' or $method eq 'POST' or $method eq 'PUT') { 
-		&{$self->pre_post}($self);
-		$self->_post;
-		&{$self->post_post}($self);
+		$self->{user_error} = &{$self->pre_post}($self);
+		unless($self->{user_error}) {
+			$self->_post;
+			&{$self->post_post}($self);
+		}
+		else { $self->_generate_output }
 	}
 	elsif($method eq 'DELETE') { 
-		&{$self->pre_delete}($self); #even though we may not delete, we should give user option to still run code
-		if($self->should_delete) {
+		$self->{user_error} = &{$self->pre_delete}($self); #even though we may not delete, we should give user option to still run code
+		if(not $self->{user_error} and $self->should_delete) {
 			$self->_delete;
 			&{$self->post_delete}($self);
 		}
+		else { $self->_generate_output }
 	}
 	else { 
 		$self->_set_status(405);
@@ -761,7 +766,7 @@ sub generate_output {
 sub _no_ext { 
 	my $self = shift;
 	$self->filename($_->{filename});
-	my ($no_ext) = $self->filename =~ /(.*)\.(.*)/;
+	my ($no_ext) = $self->filename =~ qr/(.*)\.(.*)/;
 	return $no_ext;
 }
 
@@ -846,6 +851,7 @@ sub _clear {
 	$self->{client_filename} = undef;
 	$self->{tmp_thumb_path} = undef;
 	$self->{tmp_file_path} = undef;
+	$self->{user_error} = undef;
 }
 
 sub _post { 
@@ -876,18 +882,29 @@ sub _generate_output {
 
 	if($method eq 'POST') {
 		my %hash;
+		unless($self->{user_error}) {
+			$hash{'url'} = $self->url;
+			$hash{'thumbnailUrl'} = $self->thumbnail_url;
+			$hash{'deleteUrl'} = $self->_delete_url;
+			$hash{'deleteType'} = 'DELETE';
+			$hash{error} = $self->_generate_error;
+		}
+		else { 
+			$self->_prepare_file_basics;
+			$hash{error} = $self->{user_error};
+		}
+
 		$hash{'name'} = $self->show_client_filename ? $self->client_filename . "" : $self->filename;
 		$hash{'size'} = $self->{file_size};
-		$hash{'url'} = $self->url;
-		$hash{'thumbnailUrl'} = $self->thumbnail_url;
-		$hash{'deleteUrl'} = $self->_delete_url;
-		$hash{'deleteType'} = 'DELETE';
-
-		$hash{'error'} = $self->_generate_error;
 		$obj->{files} = [\%hash];
 	}
 	elsif($method eq 'DELETE') { 
-		$obj->{$self->_get_param('filename')} = JSON::true;
+		unless($self->{user_error}) {
+			$obj->{$self->_get_param('filename')} = JSON::true;
+		}
+		else { 
+			$obj->{error} = $self->{user_error};
+		}
 	}
 
 	my $json = JSON::XS->new->ascii->pretty->allow_nonref;
@@ -973,10 +990,7 @@ sub _prepare_file_attrs {
 	my $self = shift;
 
 	#ORDER MATTERS
-	return undef unless $self->_set_upload_obj;
-	$self->_set_fh;
-	$self->_set_file_size;
-	$self->_set_client_filename;
+	return unless $self->_prepare_file_basics;
 	$self->_set_tmp_filename;
 	$self->_set_file_type;
 	$self->_set_is_image;
@@ -988,6 +1002,17 @@ sub _prepare_file_attrs {
 	$self->_set_num_files_in_dir;
 	$self->_set_uri;
 	$self->_set_urls;
+
+	return 1;
+}
+
+sub _prepare_file_basics { 
+	my ($self) = @_;
+
+	return undef unless $self->_set_upload_obj;
+	$self->_set_fh;
+	$self->_set_file_size;
+	$self->_set_client_filename;
 
 	return 1;
 }
@@ -1284,7 +1309,7 @@ sub _set_filename {
 		$self->filename($self->client_filename);
 	}
 	else { 
-		my $filename = md5_hex($self->client_filename . time() . int(rand(1000))) . time() . $self->filename_salt;
+		my $filename = Data::GUID->new->as_string . $self->filename_salt;
 		$self->thumbnail_filename($self->thumbnail_prefix . $filename . $self->thumbnail_postfix . '.' . $self->thumbnail_format) unless $self->thumbnail_filename;
 
 		if($self->is_image) { 
@@ -1292,7 +1317,7 @@ sub _set_filename {
 		}
 		else { 
 			#add extension if present
-			if($self->client_filename =~ /.*\.(.*)/) {
+			if($self->client_filename =~ qr/.*\.(.*)/) {
 				$filename .= '.' . $1;
 			}
 		}
@@ -1412,7 +1437,7 @@ sub _set_num_files_in_dir {
 			$chan->exec('ls -rt ' . $_->{upload_dir} . ' | wc -l');
 			my $buffer;
 			$chan->read($buffer,1024);
-			($self->{num_files_in_dir}) = $buffer =~ /(\d+)/;
+			($self->{num_files_in_dir}) = $buffer =~ qr/(\d+)/;
 			$max = $self->{num_files_in_dir} if $self->{num_files_in_dir} > $max;
 		}
 		
@@ -2502,6 +2527,13 @@ to set unique identifiers (such as an id for the file or the primary key) so tha
 find the file in your database easier to perform whatever operations
 you want to on it. B<Note:> This will be called even if
 L<should_delete|/"should_delete"> is set to false.
+If your pre_delete returns a value, this will be interpreted as an error
+message and the delete call will be terminated and will return the error.
+For example:
+
+  $j_fu->pre_delete(sub { 
+    return 'You cannot delete this file.'; #file will not be deleted
+  });
 
 =head3 post_delete
 
@@ -2525,6 +2557,13 @@ or
 
 pre_post will be called before a post request is handled.
 POST requests are what happen when jQuery File Upload uploads your file.
+If your pre_post returns a value, this will be interpreted as an error
+message and the post call will be terminated and will return the error.
+For example:
+
+  $j_fu->pre_post(sub { 
+    return 'You have too many files.'; #file will not be uploaded
+  });
 
 =head3 post_post
 
