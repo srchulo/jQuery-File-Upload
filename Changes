@@ -102,3 +102,6 @@ Revision history for jQuery-File-Upload
 
 0.25
 	added size function for file size
+
+0.26
+	fixed issue in generate_output where url was not set

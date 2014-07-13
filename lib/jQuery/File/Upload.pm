@@ -17,7 +17,7 @@ use URI;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -727,6 +727,10 @@ sub generate_output {
 		}
 		else { 
 			$h{name} = $_->{filename};
+		}
+
+		if($_->{filename}) { 
+			$self->filename($_->{filename});
 		}
 
 		if(exists $_->{thumbnail_filename}) {

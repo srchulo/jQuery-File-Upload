@@ -28,4 +28,4 @@ requires:
   Net::SSH2::SFTP: '0'
   URI: '0'
   perl: '5.006'
-version: '0.25'
+version: '0.26'
