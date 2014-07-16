@@ -108,3 +108,6 @@ Revision history for jQuery-File-Upload
 
 0.27
 	filenames now generated using Data::GUID. pre_post and pre_delete can now return errors.
+
+0.28
+	Fixed "user_eror" typo for delete in handle_request
