@@ -17,12 +17,13 @@ use Data::GUID;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
 	'_validate_min_file_size' => 'File is too small',
 	'_validate_accept_file_types' => 'Filetype not allowed',
+	'_validate_reject_file_types' => 'Filetype not allowed',
 	'_validate_max_number_of_files' => 'Maximum number of files exceeded',
 	'_validate_max_width' => 'Image exceeds maximum width',
 	'_validate_min_width' => 'Image requires a minimum width',
@@ -91,6 +92,7 @@ sub new {
 		max_file_size => undef,
 		min_file_size => 1,
 		accept_file_types => [],
+		reject_file_types => [],
 		require_image => undef,
 		max_width => undef,
 		max_height => undef,
@@ -305,8 +307,8 @@ sub accept_file_types {
 	my $self = shift;
 	     
   if (@_) {
-		my $a_ref = shift;
-		die "accept_file_types must be an array ref" unless UNIVERSAL::isa($a_ref,'ARRAY');
+	my $a_ref = shift;
+	die "accept_file_types must be an array ref" unless UNIVERSAL::isa($a_ref,'ARRAY');
    	$self->{accept_file_types} = $a_ref;
   }
 
@@ -315,6 +317,18 @@ sub accept_file_types {
 	}
 	
 	return $self->{accept_file_types};
+}
+
+sub reject_file_types { 
+	my $self = shift;
+	     
+	if (@_) {
+		my $a_ref = shift;
+		die "reject_file_types must be an array ref" unless UNIVERSAL::isa($a_ref,'ARRAY');
+		$self->{reject_file_types} = $a_ref;
+	}
+
+	return $self->{reject_file_types};
 }
 
 sub require_image { 
@@ -1051,6 +1065,7 @@ sub _validate_file {
 	$self->_validate_max_file_size and
 	$self->_validate_min_file_size and
 	$self->_validate_accept_file_types and
+	$self->_validate_reject_file_types and
 	$self->_validate_max_width and
 	$self->_validate_min_width and
 	$self->_validate_max_height and
@@ -1193,6 +1208,23 @@ sub _validate_accept_file_types {
 	else { 
 		my $types = join ",", @{$self->accept_file_types};
 		$self->{error} = ['_validate_accept_file_types',[$types],$self->{file_type}];
+		return undef;	
+	}
+}
+
+sub _validate_reject_file_types { 
+	my $self = shift;
+
+	#if reject_file_types is empty, we except all types
+	#so return true
+	return 1 unless @{$self->reject_file_types};
+
+	unless(grep { $_ eq $self->{file_type} } @{$self->{reject_file_types}}) { 
+		return 1;
+	}
+	else { 
+		my $types = join ",", @{$self->reject_file_types};
+		$self->{error} = ['_validate_reject_file_types',[$types],$self->{file_type}];
 		return undef;	
 	}
 }
@@ -2096,6 +2128,14 @@ Sets the minimum file size in bytes. Default minimum is 1 byte. to disable a min
   $j_fu->accept_file_types(['image/jpeg','image/png','image/gif','text/html']);
 
 Sets what file types are allowed to be uploaded. By default, all file types are allowed. 
+File types should be in the format of the Content-Type header sent on requests.
+
+=head3 reject_file_types
+
+  #None of these types are allowed.
+  $j_fu->reject_file_types(['image/jpeg','image/png','image/gif','text/html']);
+
+Sets what file types are NOT allowed to be uploaded. By default, all file types are allowed. 
 File types should be in the format of the Content-Type header sent on requests.
 
 =head3 require_image

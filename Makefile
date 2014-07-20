@@ -62,11 +62,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = jQuery::File::Upload
 NAME_SYM = jQuery_File_Upload
-VERSION = 0.28
+VERSION = 0.29
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_28
+VERSION_SYM = 0_29
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.28
+XS_VERSION = 0.29
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -187,15 +187,12 @@ PERL_ARCHIVE_AFTER =
 
 
 TO_INST_PM = lib/jQuery/File/.DS_Store \
-	lib/jQuery/File/Upload.pm \
-	num.pl
+	lib/jQuery/File/Upload.pm
 
 PM_TO_BLIB = lib/jQuery/File/.DS_Store \
 	blib/lib/jQuery/File/.DS_Store \
 	lib/jQuery/File/Upload.pm \
-	blib/lib/jQuery/File/Upload.pm \
-	num.pl \
-	$(INST_LIB)/jQuery/File/num.pl
+	blib/lib/jQuery/File/Upload.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -265,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = jQuery-File-Upload
-DISTVNAME = jQuery-File-Upload-0.28
+DISTVNAME = jQuery-File-Upload-0.29
 
 
 # --- MakeMaker macro section:
@@ -517,7 +514,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Net::SSH2::SFTP: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.006'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.28'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.29'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -568,7 +565,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.28"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.29"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -894,8 +891,7 @@ ppd :
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
 	  lib/jQuery/File/.DS_Store blib/lib/jQuery/File/.DS_Store \
-	  lib/jQuery/File/Upload.pm blib/lib/jQuery/File/Upload.pm \
-	  num.pl $(INST_LIB)/jQuery/File/num.pl 
+	  lib/jQuery/File/Upload.pm blib/lib/jQuery/File/Upload.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

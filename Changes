@@ -111,3 +111,6 @@ Revision history for jQuery-File-Upload
 
 0.28
 	Fixed "user_eror" typo for delete in handle_request
+
+0.29
+	Added reject_file_types
