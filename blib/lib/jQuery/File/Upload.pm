@@ -17,7 +17,7 @@ use Data::GUID;
 #use LWP::UserAgent;
 #use LWP::Protocol::https;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 my %errors =  (
 	'_validate_max_file_size' => 'File is too big',
@@ -32,7 +32,7 @@ my %errors =  (
 );
 
 #GETTERS/SETTERS
-sub new { 
+sub new {
     my $invocant = shift;
     my $class   = ref($invocant) || $invocant;
     my $self = {
@@ -47,6 +47,7 @@ sub new {
 		format => 'jpg',
 		quality => 70,
 
+		process_images => 1,
 		thumbnail_filename => undef,
 		thumbnail_prefix => 'thumb_',
 		thumbnail_postfix => '',
@@ -55,6 +56,7 @@ sub new {
 		show_client_filename => 1,
 		use_client_filename => undef,
 		filename_salt => '',
+		copy_file => 0,
 		script_url => undef,
 		tmp_dir => '/tmp',
 		should_delete => 1,
@@ -99,7 +101,7 @@ sub new {
 		min_width => 1,
 		min_height => 1,
 		max_number_of_files => undef,
-		
+
 		#not to be used by users
 		output => undef,
 		handle => undef,
@@ -119,15 +121,15 @@ sub new {
     return bless $self, $class;
 }
 
-sub upload_dir { 
+sub upload_dir {
 	my $self = shift;
-	     
+
   if (@_) {
  		$self->{upload_dir} = shift;
   }
-	
+
 	#set upload_dir to directory of this script if not provided
-	if(!(defined $self->{upload_dir})) { 
+	if(!(defined $self->{upload_dir})) {
 		$self->{upload_dir} = abs_path($0);
 		$self->{upload_dir} =~ s/(.*)\/.*/$1/;
 		$self->{upload_dir} .= '/files';
@@ -136,59 +138,59 @@ sub upload_dir {
 	return $self->{upload_dir};
 }
 
-sub thumbnail_upload_dir { 
+sub thumbnail_upload_dir {
 	my $self = shift;
-	     
+
   if (@_) {
 	  $self->{thumbnail_upload_dir} = shift;
   }
-	
+
 	#set upload_dir to directory of this script if not provided
-	if(!(defined $self->{thumbnail_upload_dir})) { 
+	if(!(defined $self->{thumbnail_upload_dir})) {
 			$self->{thumbnail_upload_dir} = $self->upload_dir;
 	}
 
 	return $self->{thumbnail_upload_dir};
 }
 
-sub upload_url_base { 
+sub upload_url_base {
 	my $self = shift;
-	     
+
   if (@_) {
   	$self->{upload_url_base} = shift;
   }
-	
-	if(!(defined $self->{upload_url_base})) { 
+
+	if(!(defined $self->{upload_url_base})) {
 		$self->{upload_url_base} = $self->_url_base . $self->relative_url_path;
 	}
 
 	return $self->{upload_url_base};
 }
 
-sub _url_base { 
+sub _url_base {
 	my $self = shift;
 	my $url;
-		
+
 	if($self->relative_to_host) {
 		$url = $self->{uri}->scheme . '://' . $self->{uri}->host;
 	}
-	else { 
+	else {
 		$url = $self->script_url;
 		$url =~ s/(.*)\/.*/$1/;
 	}
 
-	return $url;	
+	return $url;
 }
 
-sub thumbnail_url_base { 
+sub thumbnail_url_base {
 	my $self = shift;
-	     
+
 	if (@_) {
  	 $self->{thumbnail_url_base} = shift;
   }
-	
-	if(!(defined $self->{thumbnail_url_base})) { 
-		if(defined $self->thumbnail_relative_url_path) { 
+
+	if(!(defined $self->{thumbnail_url_base})) {
+		if(defined $self->thumbnail_relative_url_path) {
 			$self->{thumbnail_url_base} = $self->_url_base . $self->thumbnail_relative_url_path;
 		}
 		else {
@@ -200,30 +202,30 @@ sub thumbnail_url_base {
 }
 
 
-sub relative_url_path { 
+sub relative_url_path {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{relative_url_path} = shift;
 	}
 
 	return $self->{relative_url_path};
 }
 
-sub thumbnail_relative_url_path { 
+sub thumbnail_relative_url_path {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{thumbnail_relative_url_path} = shift;
 	}
 
 	return $self->{thumbnail_relative_url_path};
 }
 
-sub relative_to_host { 
+sub relative_to_host {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{relative_to_host} = shift;
 	}
 
@@ -232,96 +234,96 @@ sub relative_to_host {
 
 
 
-sub field_name { 
+sub field_name {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{field_name} = shift;
     }
-	
+
 	return $self->{field_name};
 }
 
-sub ctx { 
+sub ctx {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{ctx} = shift;
     }
-	
+
 	return $self->{ctx};
 }
 
-sub cgi { 
+sub cgi {
 	my $self = shift;
-	     
+
     if (@_) {
 	    $self->{cgi} = shift;
     }
 	$self->{cgi} = CGI->new unless defined $self->{cgi};
-	
+
 	return $self->{cgi};
 }
 
-sub should_delete { 
+sub should_delete {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{should_delete} = shift;
     }
-	
+
 	return $self->{should_delete};
 }
 
-sub scp { 
+sub scp {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{scp} = shift;
     }
-	
+
 	return $self->{scp};
 }
 
-sub max_file_size { 
+sub max_file_size {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{max_file_size} = shift;
     }
-	
+
 	return $self->{max_file_size};
 }
 
-sub min_file_size { 
+sub min_file_size {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{min_file_size} = shift;
     }
-	
+
 	return $self->{min_file_size};
 }
 
-sub accept_file_types { 
+sub accept_file_types {
 	my $self = shift;
-	     
+
   if (@_) {
 	my $a_ref = shift;
 	die "accept_file_types must be an array ref" unless UNIVERSAL::isa($a_ref,'ARRAY');
    	$self->{accept_file_types} = $a_ref;
   }
 
-	if(scalar(@{$self->{accept_file_types}}) == 0 and $self->require_image) { 
+	if(scalar(@{$self->{accept_file_types}}) == 0 and $self->require_image) {
 		$self->{accept_file_types} = ['image/jpeg','image/jpg','image/png','image/gif'];
 	}
-	
+
 	return $self->{accept_file_types};
 }
 
-sub reject_file_types { 
+sub reject_file_types {
 	my $self = shift;
-	     
+
 	if (@_) {
 		my $a_ref = shift;
 		die "reject_file_types must be an array ref" unless UNIVERSAL::isa($a_ref,'ARRAY');
@@ -331,320 +333,320 @@ sub reject_file_types {
 	return $self->{reject_file_types};
 }
 
-sub require_image { 
+sub require_image {
 	my $self = shift;
-	     
+
   if (@_) {
    	$self->{require_image} = shift;
   }
-	
+
 	return $self->{require_image};
 }
 
-sub delete_params { 
+sub delete_params {
 	my $self = shift;
-	     
+
     if (@_) {
 		my $a_ref = shift;
 		die "delete_params must be an array ref" unless UNIVERSAL::isa($a_ref,'ARRAY');
         $self->{delete_params} = $a_ref;
     }
-	
+
 	return $self->{delete_params};
 }
 
-sub delete_url { 
+sub delete_url {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{delete_url} = shift;
 	}
 
 	return $self->{delete_url};
 }
 
-sub thumbnail_width { 
+sub thumbnail_width {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_width} = shift;
     }
-	
+
 	return $self->{thumbnail_width};
 }
 
-sub thumbnail_height { 
+sub thumbnail_height {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_height} = shift;
     }
-	
+
 	return $self->{thumbnail_height};
 }
 
-sub thumbnail_quality { 
+sub thumbnail_quality {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_quality} = shift;
     }
-	
+
 	return $self->{thumbnail_quality};
 }
 
-sub thumbnail_format { 
+sub thumbnail_format {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_format} = shift;
     }
-	
+
 	return $self->{thumbnail_format};
 }
 
-sub thumbnail_density { 
+sub thumbnail_density {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_density} = shift;
     }
-	
+
 	return $self->{thumbnail_density};
 }
 
-sub thumbnail_prefix { 
+sub thumbnail_prefix {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_prefix} = shift;
     }
-	
+
 	return $self->{thumbnail_prefix};
 }
 
-sub thumbnail_postfix { 
+sub thumbnail_postfix {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_postfix} = shift;
     }
-	
+
 	return $self->{thumbnail_postfix};
 }
 
-sub thumbnail_final_width { 
+sub thumbnail_final_width {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{thumbnail_final_width} = shift;
 	}
 
 	return $self->{thumbnail_final_width};
 }
 
-sub thumbnail_final_height { 
+sub thumbnail_final_height {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{thumbnail_final_height} = shift;
 	}
 
 	return $self->{thumbnail_final_height};
 }
 
-sub quality { 
+sub quality {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{quality} = shift;
     }
-	
+
 	return $self->{quality};
 }
 
-sub format { 
+sub format {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{format} = shift;
     }
-	
+
 	return $self->{format};
 }
 
-sub final_width { 
+sub final_width {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{final_width} = shift;
 	}
 
 	return $self->{final_width};
 }
 
-sub final_height { 
+sub final_height {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{final_height} = shift;
 	}
 
 	return $self->{final_height};
 }
 
-sub max_width { 
+sub max_width {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{max_width} = shift;
     }
-	
+
 	return $self->{max_width};
 }
 
-sub max_height { 
+sub max_height {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{max_height} = shift;
     }
-	
+
 	return $self->{max_height};
 }
 
-sub min_width { 
+sub min_width {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{min_width} = shift;
     }
-	
+
 	return $self->{min_width};
 }
 
-sub min_height { 
+sub min_height {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{min_height} = shift;
     }
-	
+
 	return $self->{min_height};
 }
 
-sub max_number_of_files { 
+sub max_number_of_files {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{max_number_of_files} = shift;
     }
-	
+
 	return $self->{max_number_of_files};
 }
 
-sub filename { 
+sub filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{filename} = shift;
     }
-	
+
 	return $self->{filename};
 }
 
-sub absolute_filename { 
+sub absolute_filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{absolute_filename} = shift;
     }
-	
+
 	return $self->{absolute_filename};
 }
 
-sub thumbnail_filename { 
+sub thumbnail_filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{thumbnail_filename} = shift;
     }
-	
+
 	return $self->{thumbnail_filename};
 }
 
-sub absolute_thumbnail_filename { 
+sub absolute_thumbnail_filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{absolute_thumbnail_filename} = shift;
     }
-	
+
 	return $self->{absolute_thumbnail_filename};
 }
 
-sub client_filename { 
+sub client_filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{client_filename} = shift;
     }
-	
+
 	return $self->{client_filename};
 }
 
-sub show_client_filename { 
+sub show_client_filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{show_client_filename} = shift;
     }
-	
+
 	return $self->{show_client_filename};
 }
 
-sub use_client_filename { 
+sub use_client_filename {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{use_client_filename} = shift;
     }
-	
+
 	return $self->{use_client_filename};
 }
 
-sub filename_salt { 
+sub filename_salt {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{filename_salt} = shift;
     }
-	
+
 	return $self->{filename_salt};
 }
 
-sub tmp_dir { 
+sub tmp_dir {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{tmp_dir} = shift;
     }
-	
+
 	return $self->{tmp_dir};
 }
 
-sub script_url { 
+sub script_url {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{script_url} = shift;
     }
-	
+
 	if(!(defined $self->{script_url})) {
-		if(defined $self->ctx) { 
+		if(defined $self->ctx) {
 			$self->{script_url} = $self->ctx->request->uri;
 		}
-		else { 
+		else {
 			$self->{script_url} = $ENV{SCRIPT_URI};
 		}
 	}
@@ -652,17 +654,37 @@ sub script_url {
 	return $self->{script_url};
 }
 
-sub data { 
+sub data {
 	my $self = shift;
 
-	if(@_) { 
+	if(@_) {
 		$self->{data} = shift;
 	}
 
 	return $self->{data};
 }
 
-#GETTERS 
+sub process_images {
+	my $self = shift;
+
+    if (@_) {
+        $self->{process_images} = shift;
+    }
+
+	return $self->{process_images};
+}
+
+sub copy_file {
+	my $self = shift;
+
+    if (@_) {
+        $self->{copy_file} = shift;
+    }
+
+	return $self->{copy_file};
+}
+
+#GETTERS
 sub output { shift->{output} }
 sub url { shift->{url} }
 sub thumbnail_url { shift->{thumbnail_url} }
@@ -670,11 +692,11 @@ sub is_image { shift->{is_image} }
 sub size { shift->{file_size} }
 
 #OTHER METHODS
-sub print_response { 
+sub print_response {
 	my $self = shift;
 
 	my $content_type = 'text/plain';
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 
 		#thanks to Lukas Rampa for this suggestion
   		if ($self->ctx->req->headers->header('Accept') =~ qr(application/json) ) {
@@ -685,23 +707,23 @@ sub print_response {
 		$self->ctx->res->content_type("$content_type; charset=utf-8");
 		$self->ctx->res->body($self->output . ""); #concatenate "" for when there is no output
 	}
-	else { 
+	else {
 		print "Content-type: $content_type\n\n";
 		print $self->output;
 	}
 }
 
-sub handle_request { 
+sub handle_request {
 	my $self = shift;
 	my ($print) = @_;
 
 	my $method = $self->_get_request_method;
 
-	if($method eq 'GET') { 
+	if($method eq 'GET') {
 		&{$self->pre_get}($self);
 		&{$self->post_get}($self);
 	}
-	elsif($method eq 'PATCH' or $method eq 'POST' or $method eq 'PUT') { 
+	elsif($method eq 'PATCH' or $method eq 'POST' or $method eq 'PUT') {
 		$self->{user_error} = &{$self->pre_post}($self);
 		unless($self->{user_error}) {
 			$self->_post;
@@ -709,7 +731,7 @@ sub handle_request {
 		}
 		else { $self->_generate_output }
 	}
-	elsif($method eq 'DELETE') { 
+	elsif($method eq 'DELETE') {
 		$self->{user_error} = &{$self->pre_delete}($self); #even though we may not delete, we should give user option to still run code
 		if(not $self->{user_error} and $self->should_delete) {
 			$self->_delete;
@@ -717,7 +739,7 @@ sub handle_request {
 		}
 		else { $self->_generate_output }
 	}
-	else { 
+	else {
 		$self->_set_status(405);
 	}
 
@@ -725,7 +747,7 @@ sub handle_request {
 	$self->_clear;
 }
 
-sub generate_output { 
+sub generate_output {
 	my $self = shift;
 	my ($arr_ref) = @_;
 
@@ -733,22 +755,22 @@ sub generate_output {
 	$self->_set_uri;
 
 	my @arr;
-	for(@$arr_ref) { 
+	for(@$arr_ref) {
 		my %h;
 		die "Must provide a filename in generate_output" unless exists $_->{filename};
 		die "Must provide a size in generate_output" unless exists $_->{size};
-		$self->{is_image} = $_->{image} eq 'y' ? 1 : 0;
+		$self->{is_image} = $self->process_images && $_->{image} eq 'y' ? 1 : 0;
 		$h{size} = $_->{size};
 		$h{error} = $_->{error};
-		
-		if(exists $_->{'name'}) { 
+
+		if(exists $_->{'name'}) {
 			$h{name} = $_->{name}
 		}
-		else { 
+		else {
 			$h{name} = $_->{filename};
 		}
 
-		if($_->{filename}) { 
+		if($_->{filename}) {
 			$self->filename($_->{filename});
 		}
 
@@ -777,7 +799,7 @@ sub generate_output {
 	$self->{output} = $json->encode({files => \@arr});
 }
 
-sub _no_ext { 
+sub _no_ext {
 	my $self = shift;
 	$self->filename($_->{filename});
 	my ($no_ext) = $self->filename =~ qr/(.*)\.(.*)/;
@@ -785,67 +807,67 @@ sub _no_ext {
 }
 
 #PRE/POST METHODS
-sub pre_delete { 
+sub pre_delete {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{pre_delete} = shift;
     }
-	
+
 	return $self->{pre_delete};
 }
 
-sub post_delete { 
+sub post_delete {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{post_delete} = shift;
     }
-	
+
 	return $self->{post_delete};
 }
 
-sub pre_post { 
+sub pre_post {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{pre_post} = shift;
     }
-	
+
 	return $self->{pre_post};
 }
 
-sub post_post { 
+sub post_post {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{post_post} = shift;
     }
-	
+
 	return $self->{post_post};
 }
 
-sub pre_get { 
+sub pre_get {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{pre_get} = shift;
     }
-	
+
 	return $self->{pre_get};
 }
 
-sub post_get { 
+sub post_get {
 	my $self = shift;
-	     
+
     if (@_) {
         $self->{post_get} = shift;
     }
-	
+
 	return $self->{post_get};
 }
 
-sub _clear { 
+sub _clear {
 	my $self = shift;
 
 	#clear cgi object so we get a new one for new request
@@ -868,7 +890,7 @@ sub _clear {
 	$self->{user_error} = undef;
 }
 
-sub _post { 
+sub _post {
 	my $self = shift;
 
 	if($self->_prepare_file_attrs and $self->_validate_file) {
@@ -880,7 +902,7 @@ sub _post {
 	}
 
 	#delete temporary files
-	if($self->is_image) { 
+	if($self->is_image) {
 		unlink ($self->{tmp_thumb_path}, $self->{tmp_file_path});
 	}
 
@@ -888,9 +910,9 @@ sub _post {
 	$self->_generate_output;
 }
 
-sub _generate_output { 
+sub _generate_output {
 	my $self = shift;
-  	
+
 	my $method = $self->_get_request_method;
 	my $obj;
 
@@ -903,7 +925,7 @@ sub _generate_output {
 			$hash{'deleteType'} = 'DELETE';
 			$hash{error} = $self->_generate_error;
 		}
-		else { 
+		else {
 			$self->_prepare_file_basics;
 			$hash{error} = $self->{user_error};
 		}
@@ -912,11 +934,11 @@ sub _generate_output {
 		$hash{'size'} = $self->{file_size};
 		$obj->{files} = [\%hash];
 	}
-	elsif($method eq 'DELETE') { 
+	elsif($method eq 'DELETE') {
 		unless($self->{user_error}) {
 			$obj->{$self->_get_param('filename')} = JSON::true;
 		}
-		else { 
+		else {
 			$obj->{error} = $self->{user_error};
 		}
 	}
@@ -925,25 +947,25 @@ sub _generate_output {
 	$self->{output} = $json->encode($obj);
 }
 
-sub _delete { 
+sub _delete {
 	my $self = shift;
 
 	my $filename = $self->_get_param('filename');
 	my $thumbnail_filename = $self->_get_param('thumbnail_filename');
 	my $image_yn = $self->_get_param('image');
 
-	if(@{$self->scp}) { 
-		for(@{$self->scp}) { 
-			
+	if(@{$self->scp}) {
+		for(@{$self->scp}) {
+
 			my $ssh2 = $self->_auth_user($_);
 			$_->{thumbnail_upload_dir} = $_->{upload_dir} if $_->{thumbnail_upload_dir} eq '';
 
 			my $sftp = $ssh2->sftp;
 			$sftp->unlink($_->{upload_dir} . '/' . $filename);
 			$sftp->unlink($_->{thumbnail_upload_dir} . '/' . $thumbnail_filename) if $image_yn eq 'y';
-		}		
+		}
 	}
-	else { 
+	else {
 		my $no_ext = $self->_no_ext;
 		unlink $self->upload_dir . '/' . $filename;
 		unlink($self->thumbnail_upload_dir . '/' . $thumbnail_filename) if $image_yn eq 'y';
@@ -952,19 +974,19 @@ sub _delete {
 	$self->_generate_output;
 }
 
-sub _get_param { 
+sub _get_param {
 	my $self = shift;
 	my ($param) = @_;
 
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		return $self->ctx->req->params->{$param};
 	}
-	else { 
+	else {
 		return $self->cgi->param($param);
 	}
 }
 
-sub _delete_url { 
+sub _delete_url {
 	my $self = shift;
 	return if $self->delete_url ne '';
 	my ($delete_params) = @_;
@@ -974,7 +996,7 @@ sub _delete_url {
 
 	my $image_yn = $self->is_image ? 'y' : 'n';
 
-	unless(defined $delete_params and scalar(@$delete_params)) { 
+	unless(defined $delete_params and scalar(@$delete_params)) {
 		$delete_params = [];
 	}
 
@@ -989,18 +1011,18 @@ sub _delete_url {
 	return $self->delete_url;
 }
 
-sub _script_url { 
+sub _script_url {
 	my $self = shift;
 
-	if(defined $self->ctx) { 
-		return $self->ctx->request->uri;	
+	if(defined $self->ctx) {
+		return $self->ctx->request->uri;
 	}
-	else { 
+	else {
 		return $ENV{'SCRIPT_URI'};
 	}
 }
 
-sub _prepare_file_attrs { 
+sub _prepare_file_attrs {
 	my $self = shift;
 
 	#ORDER MATTERS
@@ -1020,7 +1042,7 @@ sub _prepare_file_attrs {
 	return 1;
 }
 
-sub _prepare_file_basics { 
+sub _prepare_file_basics {
 	my ($self) = @_;
 
 	return undef unless $self->_set_upload_obj;
@@ -1031,16 +1053,16 @@ sub _prepare_file_basics {
 	return 1;
 }
 
-sub _set_urls { 
+sub _set_urls {
 	my $self = shift;
 
-	if($self->is_image) { 
+	if($self->is_image) {
 		$self->{thumbnail_url} = $self->thumbnail_url_base . '/' . $self->thumbnail_filename;
 	}
 	$self->{url} = $self->upload_url_base . '/' . $self->filename;
 }
 
-sub _set_uri { 
+sub _set_uri {
 	my $self = shift;
 	#if catalyst, use URI already made?
 	if(defined $self->ctx) {
@@ -1051,7 +1073,7 @@ sub _set_uri {
 	}
 }
 
-sub _generate_error { 
+sub _generate_error {
 	my $self = shift;
 	return undef unless defined $self->{error} and @{$self->{error}};
 
@@ -1059,7 +1081,7 @@ sub _generate_error {
 	return $errors{$self->{error}->[0]} . " Restriction: $restrictions Provided: " . $self->{error}->[2];
 }
 
-sub _validate_file { 
+sub _validate_file {
 	my $self = shift;
 	return undef unless
 	$self->_validate_max_file_size and
@@ -1075,21 +1097,21 @@ sub _validate_file {
 	return 1;
 }
 
-sub _save { 
+sub _save {
 	my $self = shift;
-	
-	if(@{$self->scp}) { 
-		$self->_save_scp;	
+
+	if(@{$self->scp}) {
+		$self->_save_scp;
 	}
-	else { 
+	else {
 		$self->_save_local;
 	}
 }
 
-sub _save_scp { 
+sub _save_scp {
 	my $self = shift;
 
-	for(@{$self->scp}) { 
+	for(@{$self->scp}) {
 		die "Must provide a host to scp" if $_->{host} eq '';
 
 		$_->{thumbnail_upload_dir} = $_->{upload_dir} if $_->{thumbnail_upload_dir} eq '';
@@ -1097,28 +1119,28 @@ sub _save_scp {
 		my $path = $_->{upload_dir} . '/' . $self->filename;
 		my $thumb_path = $_->{thumbnail_upload_dir} . '/' . $self->thumbnail_filename;
 
-		if(($_->{user} ne '' and $_->{public_key} ne '' and $_->{private_key} ne '') or ($_->{user} ne '' and $_->{password} ne '')) { 
+		if(($_->{user} ne '' and $_->{public_key} ne '' and $_->{private_key} ne '') or ($_->{user} ne '' and $_->{password} ne '')) {
 			my $ssh2 = $self->_auth_user($_);
 
 			#if it is an image, scp both file and thumbnail
-			if($self->is_image) { 
+			if($self->is_image) {
 				$ssh2->scp_put($self->{tmp_file_path}, $path);
 				$ssh2->scp_put($self->{tmp_thumb_path}, $thumb_path);
 			}
-			else { 
+			else {
 				$ssh2->scp_put($self->{tmp_filename}, $path);
 			}
 
 			$ssh2->disconnect;
 		}
-		else { 
+		else {
 			die "Must provide a user and password or user and identity file for connecting to host";
 		}
-		
+
 	}
 }
 
-sub _auth_user { 
+sub _auth_user {
 	my $self = shift;
 	my ($auth) = @_;
 
@@ -1127,14 +1149,14 @@ sub _auth_user {
 	$ssh2->connect($auth->{host}) or die $!;
 
 	#authenticate
-	if($auth->{user} ne '' and $auth->{public_key} ne '' and $auth->{private_key} ne '') { 
-		$ssh2->auth_publickey($auth->{user},$auth->{public_key},$auth->{private_key});	
+	if($auth->{user} ne '' and $auth->{public_key} ne '' and $auth->{private_key} ne '') {
+		$ssh2->auth_publickey($auth->{user},$auth->{public_key},$auth->{private_key});
 	}
-	else { 
+	else {
 		$ssh2->auth_password($auth->{user},$auth->{password});
 	}
 
-	unless($ssh2->auth_ok) { 
+	unless($ssh2->auth_ok) {
 		die "error authenticating with remote server";
 	}
 
@@ -1143,20 +1165,24 @@ sub _auth_user {
 	return $ssh2;
 }
 
-sub _save_local { 
+sub _save_local {
 	my $self = shift;
 
 	#if image
-	if($self->is_image) { 
+	if($self->is_image) {
 		rename $self->{tmp_file_path}, $self->absolute_filename;
 		rename $self->{tmp_thumb_path}, $self->absolute_thumbnail_filename;
 	}
 	#if non-image with catalyst
-	elsif(defined $self->ctx) { 
-		$self->{upload}->link_to($self->absolute_filename);
+	elsif(defined $self->ctx) {
+		if ($self->copy_file) {
+			$self->{upload}->copy_to($self->absolute_filename);
+		} else {
+			$self->{upload}->link_to($self->absolute_filename);
+		}
 	}
 	#if non-image with regular CGI perl
-	else { 
+	else {
 		my $io_handle = $self->{fh}->handle;
 
 		my $buffer;
@@ -1169,185 +1195,185 @@ sub _save_local {
 	}
 }
 
-sub _validate_max_file_size { 
+sub _validate_max_file_size {
 	my $self = shift;
 	return 1 unless $self->max_file_size;
-	
-	if($self->{file_size} > $self->max_file_size) { 
+
+	if($self->{file_size} > $self->max_file_size) {
 		$self->{error} = ['_validate_max_file_size',[$self->max_file_size],$self->{file_size}];
 		return undef;
 	}
-	else { 
+	else {
 		return 1;
 	}
 }
 
-sub _validate_min_file_size { 
+sub _validate_min_file_size {
 	my $self = shift;
 	return 1 unless $self->min_file_size;
-	
-	if($self->{file_size} < $self->min_file_size) { 
+
+	if($self->{file_size} < $self->min_file_size) {
 		$self->{error} = ['_validate_min_file_size',[$self->min_file_size],$self->{file_size}];
 		return undef;
 	}
-	else { 
+	else {
 		return 1;
 	}
 }
 
-sub _validate_accept_file_types { 
+sub _validate_accept_file_types {
 	my $self = shift;
 
 	#if accept_file_types is empty, we except all types
 	#so return true
 	return 1 unless @{$self->accept_file_types};
 
-	if(grep { $_ eq $self->{file_type} } @{$self->{accept_file_types}}) { 
+	if(grep { $_ eq $self->{file_type} } @{$self->{accept_file_types}}) {
 		return 1;
 	}
-	else { 
+	else {
 		my $types = join ",", @{$self->accept_file_types};
 		$self->{error} = ['_validate_accept_file_types',[$types],$self->{file_type}];
-		return undef;	
+		return undef;
 	}
 }
 
-sub _validate_reject_file_types { 
+sub _validate_reject_file_types {
 	my $self = shift;
 
 	#if reject_file_types is empty, we except all types
 	#so return true
 	return 1 unless @{$self->reject_file_types};
 
-	unless(grep { $_ eq $self->{file_type} } @{$self->{reject_file_types}}) { 
+	unless(grep { $_ eq $self->{file_type} } @{$self->{reject_file_types}}) {
 		return 1;
 	}
-	else { 
+	else {
 		my $types = join ",", @{$self->reject_file_types};
 		$self->{error} = ['_validate_reject_file_types',[$types],$self->{file_type}];
-		return undef;	
+		return undef;
 	}
 }
 
-sub _validate_max_width { 
+sub _validate_max_width {
 	my $self = shift;
 	return 1 unless $self->is_image;
 
 	#if set to undef, there's no max_width
 	return 1 unless $self->max_width;
 
-	if($self->{width} > $self->max_width) { 
+	if($self->{width} > $self->max_width) {
 		$self->{error} = ['_validate_max_width',[$self->max_width],$self->{width}];
 		return undef;
 	}
-	else { 
+	else {
 		return 1;
-	}	
+	}
 }
 
-sub _validate_min_width { 
+sub _validate_min_width {
 	my $self = shift;
 	return 1 unless $self->is_image;
 
 	#if set to undef, there's no min_width
 	return 1 unless $self->min_width;
 
-	if($self->{width} < $self->min_width) { 
+	if($self->{width} < $self->min_width) {
 		$self->{error} = ['_validate_min_width',[$self->min_width],$self->{width}];
 		return undef;
 	}
-	else { 
+	else {
 		return 1;
-	}	
+	}
 }
 
-sub _validate_max_height { 
+sub _validate_max_height {
 	my $self = shift;
 	return 1 unless $self->is_image;
 
 	#if set to undef, there's no max_height
 	return 1 unless $self->max_height;
 
-	if($self->{height} > $self->max_height) { 
+	if($self->{height} > $self->max_height) {
 		$self->{error} = ['_validate_max_height',[$self->max_height],$self->{height}];
 		return undef;
 	}
-	else { 
+	else {
 		return 1;
-	}	
+	}
 }
 
-sub _validate_min_height { 
+sub _validate_min_height {
 	my $self = shift;
 	return 1 unless $self->is_image;
 
 	#if set to undef, there's no max_height
 	return 1 unless $self->min_height;
 
-	if($self->{height} < $self->min_height) { 
+	if($self->{height} < $self->min_height) {
 		$self->{error} = ['_validate_min_height',[$self->min_height],$self->{height}];
 		return undef;
 	}
-	else { 
+	else {
 		return 1;
-	}	
+	}
 }
 
-sub _validate_max_number_of_files { 
+sub _validate_max_number_of_files {
 	my $self = shift;
 	return 1 unless $self->max_number_of_files;
 
-	if($self->{num_files_in_dir} > $self->max_number_of_files) { 
+	if($self->{num_files_in_dir} > $self->max_number_of_files) {
 		$self->{error} = ['_validate_max_number_of_files',[$self->max_number_of_files],$self->{num_files_in_dir}];
-		return undef;	
+		return undef;
 	}
-	else { 
+	else {
 		return 1;
 	}
 }
 
-sub _set_file_size { 
+sub _set_file_size {
 	my $self = shift;
 
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		$self->{file_size} = $self->{upload}->size;
 	}
-	else { 
+	else {
 		$self->{file_size} = -s $self->{upload};
 	}
 
 	return $self->{file_size};
 }
 
-sub _set_client_filename { 
+sub _set_client_filename {
 	my $self = shift;
 	return if defined $self->client_filename;
 
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		$self->client_filename($self->{upload}->filename);
 	}
-	else { 
+	else {
 		$self->client_filename($self->cgi->param($self->field_name));
 	}
 
 	return $self->client_filename;
 }
 
-sub _set_filename { 
+sub _set_filename {
 	my $self = shift;
 	return if defined $self->filename;
 
-	if($self->use_client_filename) { 
+	if($self->use_client_filename) {
 		$self->filename($self->client_filename);
 	}
-	else { 
+	else {
 		my $filename = Data::GUID->new->as_string . $self->filename_salt;
 		$self->thumbnail_filename($self->thumbnail_prefix . $filename . $self->thumbnail_postfix . '.' . $self->thumbnail_format) unless $self->thumbnail_filename;
 
-		if($self->is_image) { 
+		if($self->is_image) {
 			$filename .= '.' . $self->format;
 		}
-		else { 
+		else {
 			#add extension if present
 			if($self->client_filename =~ qr/.*\.(.*)/) {
 				$filename .= '.' . $1;
@@ -1359,40 +1385,40 @@ sub _set_filename {
 	return $self->filename;
 }
 
-sub _set_absolute_filenames { 
+sub _set_absolute_filenames {
 	my $self = shift;
 
 	$self->absolute_filename($self->upload_dir . '/' . $self->filename) unless $self->absolute_filename;
 	$self->absolute_thumbnail_filename($self->thumbnail_upload_dir . '/' . $self->thumbnail_filename) unless $self->absolute_thumbnail_filename;
 }
 
-sub _set_file_type { 
+sub _set_file_type {
 	my $self = shift;
 
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		$self->{file_type} = $self->{upload}->type;
 	}
-	else { 
+	else {
 		$self->{file_type} = $self->cgi->uploadInfo($self->client_filename)->{'Content-Type'};
 	}
 
 	return $self->{file_type};
 }
 
-sub _set_is_image { 
+sub _set_is_image {
 	my $self = shift;
 
-	if($self->{file_type} eq 'image/jpeg' or $self->{file_type} eq 'image/jpg' or $self->{file_type} eq 'image/png' or $self->{file_type} eq 'image/gif') { 
+	if($self->process_images and ($self->process_images and ($self->{file_type} eq 'image/jpeg' or $self->{file_type} eq 'image/jpg' or $self->{file_type} eq 'image/png' or $self->{file_type} eq 'image/gif'))) {
 		$self->{is_image} = 1;
 	}
-	else { 
+	else {
 		$self->{is_image} = 0;
 	}
 
 	return $self->is_image;
 }
 
-sub _set_image_magick { 
+sub _set_image_magick {
 	my $self = shift;
 	return unless $self->is_image;
 
@@ -1404,64 +1430,64 @@ sub _set_image_magick {
 	return $self->{image_magick};
 }
 
-sub _set_width { 
+sub _set_width {
 	my $self = shift;
 	return unless $self->is_image;
 
 	$self->{width} = $self->{image_magick}->Get('width');
 }
 
-sub _set_height { 
+sub _set_height {
 	my $self = shift;
 	return unless $self->is_image;
 
 	$self->{height} = $self->{image_magick}->Get('height');
 }
 
-sub _set_tmp_filename { 
+sub _set_tmp_filename {
 	my $self = shift;
 
 	my $tmp_filename;
-	if(defined $self->ctx) { 
-		$self->{tmp_filename} = $self->{upload}->tempname;	
+	if(defined $self->ctx) {
+		$self->{tmp_filename} = $self->{upload}->tempname;
 	}
-	else { 
+	else {
 		$self->{tmp_filename} = $self->cgi->tmpFileName($self->client_filename);
 	}
 }
 
-sub _set_upload_obj { 
+sub _set_upload_obj {
 	my $self = shift;
 
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		$self->{upload} = $self->ctx->request->upload($self->field_name);
 	}
-	else { 
+	else {
 		$self->{upload} = $self->cgi->upload($self->field_name);
 	}
 
 	return defined $self->{upload};
 }
 
-sub _set_fh { 
+sub _set_fh {
 	my $self = shift;
 
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		$self->{fh} = $self->{upload}->fh;
 	}
-	else { 
+	else {
 		$self->{fh} = $self->{upload};
 	}
 
 	return $self->{fh};
 }
 
-sub _set_num_files_in_dir { 
+sub _set_num_files_in_dir {
 	my $self = shift;
 	return unless $self->max_number_of_files;
 
 	#DO SCP VERSION
-	if(@{$self->{scp}}) { 
+	if(@{$self->{scp}}) {
 		my $max = 0;
 		for(@{$self->{scp}}) {
 			my $ssh2 = $self->_auth_user($_);
@@ -1472,7 +1498,7 @@ sub _set_num_files_in_dir {
 			($self->{num_files_in_dir}) = $buffer =~ qr/(\d+)/;
 			$max = $self->{num_files_in_dir} if $self->{num_files_in_dir} > $max;
 		}
-		
+
 		#set to maximum of hosts because we know if one's over that's too many
 		$self->{num_files_in_dir} = $max;
 	}
@@ -1485,69 +1511,69 @@ sub _set_num_files_in_dir {
 	return $self->{num_files_in_dir};
 }
 
-sub _get_request_method { 
+sub _get_request_method {
 	my $self = shift;
-	
+
 	my $method = '';
-	if(defined $self->ctx) { 
+	if(defined $self->ctx) {
 		$method = $self->ctx->req->method;
 	}
-	else { 
+	else {
 		$method = $self->cgi->request_method;
 	}
 
 	return $method;
 }
 
-sub _set_status { 
+sub _set_status {
 	my $self = shift;
 	my ($response) = @_;
 
-	if(defined $self->ctx) { 
-		$self->ctx->response->status($response);	
+	if(defined $self->ctx) {
+		$self->ctx->response->status($response);
 	}
-	else { 
-		print $self->cgi->header(-status=>$response);	
+	else {
+		print $self->cgi->header(-status=>$response);
 	}
 }
 
-sub _set_header { 
+sub _set_header {
 	my $self = shift;
 	my ($key,$val) = @_;
 
-	if(defined $self->ctx) { 
-		$self->ctx->response->header($key => $val);	
+	if(defined $self->ctx) {
+		$self->ctx->response->header($key => $val);
 	}
-	else { 
+	else {
 		print $self->cgi->header($key,$val);
 	}
 }
 
 sub _create_thumbnail {
   my $self = shift;
-   
+
   my $im = $self->{image_magick}->Clone;
-   
+
 	#thumb is added at beginning of tmp_thumb_path as to not clash with the original image file path
   my $output  = $self->{tmp_thumb_path} = $self->tmp_dir . '/thumb_' . $self->thumbnail_filename;
   my $width   = $self->thumbnail_width;
   my $height  = $self->thumbnail_height;
- 
+
   my $density = $self->thumbnail_density || $width . "x" . $height;
   my $quality = $self->thumbnail_quality;
   my $format  = $self->thumbnail_format;
- 
-  # source image dimensions  
+
+  # source image dimensions
   my ($o_width, $o_height) = $im->Get('width','height');
-   
+
   # calculate image dimensions required to fit onto thumbnail
   my ($t_width, $t_height, $ratio);
   # wider than tall (seems to work...) needs testing
   if( $o_width > $o_height ){
     $ratio = $o_width / $o_height;
-    $t_width = $width;    
+    $t_width = $width;
     $t_height = $width / $ratio;
- 
+
     # still won't fit, find the smallest size.
     while($t_height > $height){
       $t_height -= $ratio;
@@ -1556,10 +1582,10 @@ sub _create_thumbnail {
   }
   # taller than wide
   elsif( $o_height > $o_width ){
-    $ratio = $o_height / $o_width;  
+    $ratio = $o_height / $o_width;
     $t_height = $height;
     $t_width = $height / $ratio;
- 
+
     # still won't fit, find the smallest size.
     while($t_width > $width){
       $t_width -= $ratio;
@@ -1582,7 +1608,7 @@ sub _create_thumbnail {
     $im->Resize( width => $t_width, height => $t_height );
     $im->Set( quality => $quality );
     $im->Set( density => $density );
-     
+
 	$self->final_width($t_width);
 	$self->final_height($t_height);
 
@@ -1590,10 +1616,10 @@ sub _create_thumbnail {
   }
 }
 
-sub _create_tmp_image { 
+sub _create_tmp_image {
   my $self = shift;
   my $im = $self->{image_magick};
-   
+
 	#main_ is added as to not clash with thumbnail tmp path if thumbnail_prefix = '' and they have the same name
   my $output  = $self->{tmp_file_path} = $self->tmp_dir . '/main_' . $self->filename;
   my $quality = $self->thumbnail_quality;
@@ -1601,7 +1627,7 @@ sub _create_tmp_image {
 
   if( defined $im ){
     $im->Set( quality => $quality );
-     
+
 	$im->Write("$format:$output");
 
 	$self->final_width($im->Get('width'));
@@ -1656,7 +1682,7 @@ sub _create_tmp_image {
 #
 ##      my $reqPUT = HTTP::Request->new(PUT => $s_url);
 #      $reqPUT->header('X-Auth-Token' => $res->header('X-Auth-Token'));
-#     
+#
 ##      $reqPUT->content( $s_contents );
 #
 #     my $resPUT = $ua->request($reqPUT);
@@ -1726,12 +1752,12 @@ The above example is the simplest one possible, however it assumes a lot of defa
 
 =item default upload directory
 
-It is assumed that your files are being uploaded to the current directory of the script that's running, plus '/files'. 
+It is assumed that your files are being uploaded to the current directory of the script that's running, plus '/files'.
 So if your script is in /home/user/public_html, your files will be uploaded to /home/user/public_html/files.
 
 =item default url
 
-It is also assumed that the files will be hosted one directory above the running script, plus '/files'. So if the 
+It is also assumed that the files will be hosted one directory above the running script, plus '/files'. So if the
 script is located at the url http://www.mydomain.com/upload.cgi, then all files will be assumed to be at the url
 http://www.mydomain.com/files/file_name.
 
@@ -1759,12 +1785,12 @@ This implementation accepts all types of files.
 
   use jQuery::File::Upload;
 
-  my $j_fu = jQuery::File::Upload->new( 
+  my $j_fu = jQuery::File::Upload->new(
 		scp => [{
 			user => 'user', #remote user
 			public_key => '/home/user/.ssh/id_rsa.pub',	#also possible to use password instead of keys
-			private_key => '/home/user/.ssh/id_rsa',	
-			host => 'mydomain.com', 
+			private_key => '/home/user/.ssh/id_rsa',
+			host => 'mydomain.com',
 			upload_dir => '/var/www/html/files', #directory that files will be uploaded to
 		}],
 
@@ -1787,8 +1813,8 @@ This implementation accepts all types of files.
 
   use jQuery::File::Upload;
 
-  my $j_fu = jQuery::File::Upload->new( 
-			pre_get => sub { 
+  my $j_fu = jQuery::File::Upload->new(
+			pre_get => sub {
 				my $j = shift; #jQuery::File::Upload object for current request
 				#any code in here will be executed before any get requests are handled
 				#jQuery File Upload makes Get request when the page first loads, so this
@@ -1796,18 +1822,18 @@ This implementation accepts all types of files.
 				#jQuery File upload with saved data to view/delete/upload more
 
 				#generate starting files for jQuery File Upload
-				$j->generate_output( 
+				$j->generate_output(
 					[
-						{ 
+						{
 							size => 500000,
 							filename =>	'my_image.jpeg',
 							image => 'y', #need to let jQuery::File::Upload know this is an image
    								      #or else thumbnails won't be deleted
 						},
-						{ 
+						{
 							size => 500000,
 							filename =>	'my_other_image.jpeg',
-							image => 'y', 
+							image => 'y',
 						},
 					]
 				);
@@ -1815,7 +1841,7 @@ This implementation accepts all types of files.
   				#The above makes assumptions yet again. It generates the url based on the defaults, unless
   				#you provide below the upload_url_base.
 			},
-			pre_delete => sub { 
+			pre_delete => sub {
 				my $j = shift;
 
 				#here you can do something with the information in the params of the delete_url
@@ -1826,7 +1852,7 @@ This implementation accepts all types of files.
 				#DELETE FROM table WHERE id=$id
 				#etc.
 			},
-			post_post => sub { 
+			post_post => sub {
 				my $j = shift;
 				#do some stuff here after post (image is uploaded)
 				#possibly save information about image in a database to keep track of it?
@@ -1834,8 +1860,8 @@ This implementation accepts all types of files.
 
 				#INSERT INTO table (name,is_image,width,height) VALUES($j->filename,$j->is_image,$j->final_width,$j->final_height)
 				#etc
-			},	
-			delete_params => ['key1','val1','key2','val2'], 
+			},
+			delete_params => ['key1','val1','key2','val2'],
                                                             #this will add these key value pairs as
                                                             #params on the delete_url that is generated
                                                             #for each image. This could be useful if you
@@ -1858,7 +1884,7 @@ It provides many features, such as:
 
 =over 4
 
-=item 1 
+=item 1
 
 the ability to SCP file uploads to remote servers
 
@@ -1885,7 +1911,7 @@ told to upload to.
 
 =head1 METHODS
 
-=head2 Getters/Setters 
+=head2 Getters/Setters
 
 =head3 new
 
@@ -1900,7 +1926,7 @@ Any of the below getters/setters can be passed into new as options.
 Sets the upload directory if saving files locally. Should not end with a slash.
 The default is the current directory of the running script with '/files' added to
 the end:
-  
+
   /home/user/public_html/upload.cgi
 
 yields:
@@ -1959,7 +1985,7 @@ Resulting thumbnail urls would look like:
   http://www.mydomain.com/files/thumbs/thumb_image.jpg
 
 However, if L<thumbnail_relative_url_base|/"thumbnail_relative_url_base">
-is set, the default will be the current url with the thumbnail 
+is set, the default will be the current url with the thumbnail
 relative base at the end.
 
 =head3 relative_url_path
@@ -1979,7 +2005,7 @@ and then all files will go after /files. The default for this is /files,
 which is why upload_url_base has the default /files at the end. If
 your location for the images is not relative, i.e. it is located
 at a different domain, then just set L<upload_url_base|/"upload_url_base">
-to get the url_base you want. There should not be 
+to get the url_base you want. There should not be
 a slash at the end.
 
 =head3 thumbnail_relative_url_path
@@ -1996,11 +2022,11 @@ yields:
   http://www.mydomain.com/files/thumbs
 
 and then all thumbnails will go after /files/thumbs. The default for this is nothing,
-so then the thumbnail_url will just fall back on whatever the value of 
+so then the thumbnail_url will just fall back on whatever the value of
 L<upload_url_base|/"upload_url_base"> is.
 If your location for thumbnail images is not relative, i.e. it is located
 at a different domain, then just set L<thumbnail_url_base|/"thumbnail_url_base">
-to get the url_base you want. There should not be 
+to get the url_base you want. There should not be
 a slash at the end.
 
 =head3 relative_to_host
@@ -2019,7 +2045,7 @@ With a L<relative_url_path|/"relative_url_path"> '/files' would yield:
 
 Whereas by default L<relative_url_path|/"relative_url_path"> and
 L<thumbnail_relative_url_path|/"thumbnail_relative_url_path"> are
-relative to the folder the upload script is running in. 
+relative to the folder the upload script is running in.
 
 If you use this option, make sure to set L<upload_dir|/"upload_dir">
 (and/or L<thumbnail_upload_dir|/"thumbnail_upload_dir"> if necessary)
@@ -2047,7 +2073,7 @@ this plugin with L<Catalyst>. The default is to not use this.
 
   $j_fu->cgi(CGI->new);
 
-This should be used mostly internally by jQuery::File::Upload 
+This should be used mostly internally by jQuery::File::Upload
 (assuming you haven't passed in ctx).
 It is just the CGI object that the module uses, however if you already
 have one you could pass it in.
@@ -2058,7 +2084,7 @@ have one you could pass it in.
 
 This is used to decide whether to actually delete the files when jQuery::File::Upload
 receives a DELETE request. The default is to delete, however this could be useful
-if you wanted to maybe just mark the field as deleted in your database (using L<pre_delete|/"pre_delete">) 
+if you wanted to maybe just mark the field as deleted in your database (using L<pre_delete|/"pre_delete">)
 and then actually physically
 remove it with your own clean up script later. The benefit to this could be that
 if you are SCPing the files to a remote server, perhaps issuing the remote commands
@@ -2069,13 +2095,13 @@ to delete these files is something that seems to costly to you.
   $j_fu->scp([{
 			host => 'media.mydomain.com',
 			user => 'user',
-		  	public_key => '/home/user/.ssh/id_rsa.pub',	
-		  	private_key => '/home/user/.ssh/id_rsa',	
+		  	public_key => '/home/user/.ssh/id_rsa.pub',
+		  	private_key => '/home/user/.ssh/id_rsa',
 			password => 'pass', #if keys are present, you do not need password
 			upload_dir => '/my/remote/dir',
 		}]);
 
-This method takes in an arrayref of hashrefs, where each hashref is a remote host you would like to SCP the files to. 
+This method takes in an arrayref of hashrefs, where each hashref is a remote host you would like to SCP the files to.
 SCPing the uploaded files to remote hosts could be useful if say you hosted your images on a different server
 than the one doing the uploading.
 
@@ -2083,7 +2109,7 @@ than the one doing the uploading.
 
 =over 4
 
-=item 
+=item
 
 host (REQUIRED) - the remote host you want to scp the files to, i.e. 127.0.0.1 or media.mydomain.com
 
@@ -2127,7 +2153,7 @@ Sets the minimum file size in bytes. Default minimum is 1 byte. to disable a min
 
   $j_fu->accept_file_types(['image/jpeg','image/png','image/gif','text/html']);
 
-Sets what file types are allowed to be uploaded. By default, all file types are allowed. 
+Sets what file types are allowed to be uploaded. By default, all file types are allowed.
 File types should be in the format of the Content-Type header sent on requests.
 
 =head3 reject_file_types
@@ -2135,7 +2161,7 @@ File types should be in the format of the Content-Type header sent on requests.
   #None of these types are allowed.
   $j_fu->reject_file_types(['image/jpeg','image/png','image/gif','text/html']);
 
-Sets what file types are NOT allowed to be uploaded. By default, all file types are allowed. 
+Sets what file types are NOT allowed to be uploaded. By default, all file types are allowed.
 File types should be in the format of the Content-Type header sent on requests.
 
 =head3 require_image
@@ -2144,7 +2170,7 @@ File types should be in the format of the Content-Type header sent on requests.
 
 If set to 1, it requires that all uploads must be an image. Setting this is equivalent
 to calling:
-  
+
   $j_fu->accept_file_types(['image/jpeg','image/jpg','image/png','image/gif']);
 
 Default is undef.
@@ -2153,7 +2179,7 @@ Default is undef.
 
   $j_fu->delete_params(['key1','val1','key2','val2']);
 
-Sets the keys and values of the params added to the delete_url. 
+Sets the keys and values of the params added to the delete_url.
 This can be useful when used with L<pre_delete|/"pre_delete">,
 because if you are keeping track of these files in a database,
 you can add unique identifiers to the params so that in L<pre_delete|/"pre_delete">
@@ -2240,6 +2266,13 @@ may not be what you orignally suggested. This gets you the final height.
 This sets the quality of the uploaded image. Default is 70 and it
 can be on a scale of 0-100. See L<Image::Magick> for more information.
 
+=head3 process_images
+
+  $j_fu->process_images(1);
+
+Create thumbnails for uploaded image files when set to 1. When set to undef, L<jQuery::File::Upload> will skip creating
+thumbnails even when the uploaded file is an image. Images are simply treated like any other file. The default is 1.
+
 =head3 format
 
   $j_fu->format('jpg');
@@ -2308,7 +2341,7 @@ You can also set the filename to use for this request before you call
 L<handle_request|/"handle_request">. However, unless you're sure
 that you are going to give the file a unique name, you should
 just let jQuery::File::Upload generate the filename. Please note
-that if you choose your own filename, you do have to manually set 
+that if you choose your own filename, you do have to manually set
 L<thumbnail_filename|/"thumbnail_filename">
 
 =head3 absolute_filename
@@ -2316,7 +2349,7 @@ L<thumbnail_filename|/"thumbnail_filename">
   my $absolute_filename = $j_fu->absolute_filename;
 
 Returns the absolute filename of the file on the server.
-You can also set this manually if you would like, or jQuery::File::Upload 
+You can also set this manually if you would like, or jQuery::File::Upload
 will generate it for you.
 
 =head3 thumbnail_filename
@@ -2333,7 +2366,7 @@ just let jQuery::File::Upload generate the filename.
   my $absolute_filename = $j_fu->absolute_thumbnail_filename;
 
 Returns the absolute filename of the thumbnail image on the server.
-You can also set this manually if you would like, or jQuery::File::Upload 
+You can also set this manually if you would like, or jQuery::File::Upload
 will generate it for you.
 
 =head3 client_filename
@@ -2357,7 +2390,7 @@ for you.
 
   $j_fu->use_client_filename(0);
 
-If this is set to true, jQuery::File::Upload will use 
+If this is set to true, jQuery::File::Upload will use
 the user's name for the file when saving it. However, this
 is not recommended because the user could have two files named
 the same thing that could overwrite one another, and same scenario
@@ -2376,6 +2409,14 @@ This is meant to be used if you want to guarantee uniqueness of image
 names, i.e. you could use a user id at the end to greatly lessen the chance
 of duplicate filenames. Default is nothing.
 
+=head3 copy_file
+
+  $j_fu->copy_file(undef);
+
+Performs a copy instead of a link from the temporary directory to the upload directory. 
+This might be useful if you are using Windows share that can't handle links. 
+The default is undef and thus L<jQuery::File::Upload> will use links.
+
 =head3 tmp_dir
 
   $j_fu->tmp_dir('/tmp');
@@ -2389,7 +2430,7 @@ Default is /tmp.
 
   $j_fu->script_url('http://www.mydomain.com/upload.cgi');
 
-This can be used to set the url of the script that jQuery::File::Upload is 
+This can be used to set the url of the script that jQuery::File::Upload is
 running under. jQuery::File::Upload then uses this value to generate
 other parts of the output. jQuery::File::Upload in most cases is able
 to figure this out on its own, however if you are experiencing issues
@@ -2416,7 +2457,7 @@ would be an equally good place to store/retrieve data that you need.
 =head2 JUST GETTERS
 
 =head3 output
- 
+
   my $output = $j_fu->output;
 
 Returns the JSON output that will be printed to the browser.
@@ -2462,7 +2503,7 @@ L<post_post|/"post_post">.
 
 Should be called after L<handle_request|/"handle_request">.
 Prints out header and JSON back to browser. Called for
-convenience by L<handle_request|/"handle_request"> if 
+convenience by L<handle_request|/"handle_request"> if
 L<handle_request|/"handle_request"> is passed a 1.
 
 =head3 handle_request
@@ -2476,7 +2517,7 @@ after it's finished.
 =head3 generate_output
 
   $j_fu->generate_output([{
-			image => 'y', #or 'n'	  
+			image => 'y', #or 'n'
 			filename => 'my_cool_pic.jpg',
 			size => 1024,
 		  }]);
@@ -2495,7 +2536,7 @@ or L<handle_request|/"handle_request"> with a 1 to print out the JSON.
 
 filename (REQUIRED) - name of the file
 
-=item 
+=item
 
 size (REQUIRED) - size in bytes
 
@@ -2529,7 +2570,7 @@ if you want to set your own parameters for the delete url.
 
 =item
 
-delete_params - The format of this is just like L<delete_params|/"delete_params">. It takes [key,value] pairs. 
+delete_params - The format of this is just like L<delete_params|/"delete_params">. It takes [key,value] pairs.
 Any values here will be added in addition to any global L<delete_params|/"delete_params"> that you set.
 
 =item
@@ -2571,7 +2612,7 @@ If your pre_delete returns a value, this will be interpreted as an error
 message and the delete call will be terminated and will return the error.
 For example:
 
-  $j_fu->pre_delete(sub { 
+  $j_fu->pre_delete(sub {
     return 'You cannot delete this file.'; #file will not be deleted
   });
 
@@ -2584,7 +2625,7 @@ or
   $j_fu->post_delete(\&mysub);
 
 post_delete will be called after a delete request is handled.
-B<Note:> This will not be called if 
+B<Note:> This will not be called if
 L<should_delete|/"should_delete"> is set to false.
 
 =head3 pre_post
@@ -2601,7 +2642,7 @@ If your pre_post returns a value, this will be interpreted as an error
 message and the post call will be terminated and will return the error.
 For example:
 
-  $j_fu->pre_post(sub { 
+  $j_fu->pre_post(sub {
     return 'You have too many files.'; #file will not be uploaded
   });
 
