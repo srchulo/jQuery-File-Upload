@@ -117,5 +117,5 @@ Revision history for jQuery-File-Upload
 
 
 0.30
-    Added copy_to and process_image
+    Added copy_to and process_images
 	Added reject_file_types
