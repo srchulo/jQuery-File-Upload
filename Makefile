@@ -16,6 +16,7 @@
 #     BUILD_REQUIRES => { Test::More=>q[0] }
 #     CONFIGURE_REQUIRES => { ExtUtils::MakeMaker=>q[0] }
 #     LICENSE => q[artistic_2]
+#     META_MERGE => { meta-spec=>{ version=>q[2] }, resources=>{ repository=>{ type=>q[git], url=>q[https://github.com/srchulo/jQuery-File-Upload.git], web=>q[https://github.com/srchulo/jQuery-File-Upload] } } }
 #     MIN_PERL_VERSION => q[5.006]
 #     NAME => q[jQuery::File::Upload]
 #     PL_FILES => {  }
@@ -62,11 +63,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = jQuery::File::Upload
 NAME_SYM = jQuery_File_Upload
-VERSION = 0.31
+VERSION = 0.32
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_31
+VERSION_SYM = 0_32
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.31
+XS_VERSION = 0.32
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -261,7 +262,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = jQuery-File-Upload
-DISTVNAME = jQuery-File-Upload-0.31
+DISTVNAME = jQuery-File-Upload-0.32
 
 
 # --- MakeMaker macro section:
@@ -516,7 +517,9 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  Net::SSH2::SFTP: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  URI: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  perl: '\''5.006'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version: '\''0.31'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  repository: https://github.com/srchulo/jQuery-File-Upload.git' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version: '\''0.32'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -568,7 +571,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.31",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "resources" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '      "repository" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '         "type" : "git",' >> META_new.json
+	$(NOECHO) $(ECHO) '         "url" : "https://github.com/srchulo/jQuery-File-Upload.git",' >> META_new.json
+	$(NOECHO) $(ECHO) '         "web" : "https://github.com/srchulo/jQuery-File-Upload"' >> META_new.json
+	$(NOECHO) $(ECHO) '      }' >> META_new.json
+	$(NOECHO) $(ECHO) '   },' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.32",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.02"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
@@ -878,7 +888,7 @@ testdb_static :: static pure_all
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="jQuery-File-Upload" VERSION="0.31">' > jQuery-File-Upload.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="jQuery-File-Upload" VERSION="0.32">' > jQuery-File-Upload.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Server-side solution for the L&lt;jQuery File Upload|https://github.com/blueimp/jQuery-File-Upload/&gt; plugin.</ABSTRACT>' >> jQuery-File-Upload.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Adam Hopkins &lt;srchulo@cpan.org&gt;</AUTHOR>' >> jQuery-File-Upload.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> jQuery-File-Upload.ppd
